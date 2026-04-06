@@ -12,7 +12,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/health', (req, res) => {
-    res.json({ status: 'OK', groq_ready: !!GROQ_API_KEY, model: 'llama-3.3-70b-versatile' });
+    res.json({ status: 'OK', groq_ready: !!GROQ_API_KEY });
 });
 
 app.post('/api/chat', async (req, res) => {
@@ -34,7 +34,7 @@ app.post('/api/chat', async (req, res) => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                model: 'llama-3.3-70b-versatile',
+                model: 'llama-3.3-70b-versatile',  // ← MODÈLE CORRECT
                 messages: [
                     {
                         role: 'system',
