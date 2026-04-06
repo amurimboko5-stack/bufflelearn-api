@@ -5,14 +5,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
 app.get('/', (req, res) => {
-    res.json({ message: 'API BuffleLearn avec DeepSeek !' });
+    res.json({ message: 'API BuffleLearn avec Groq (Llama 3 gratuit) !' });
 });
 
 app.get('/health', (req, res) => {
-    res.json({ status: 'OK', deepseek_ready: !!DEEPSEEK_API_KEY });
+    res.json({ status: 'OK', groq_ready: !!GROQ_API_KEY });
 });
 
 app.post('/api/chat', async (req, res) => {
@@ -22,29 +22,28 @@ app.post('/api/chat', async (req, res) => {
         return res.status(400).json({ error: 'Message requis' });
     }
 
-    if (!DEEPSEEK_API_KEY) {
-        return res.json({
-            response: "⚠️ Clé API DeepSeek non configurée."
-        });
+    if (!GROQ_API_KEY) {
+        return res.json({ response: "⚠️ Clé API Groq non configurée." });
     }
 
     try {
-        const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
+                'Authorization': `Bearer ${GROQ_API_KEY}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                model: 'deepseek-chat',
+                model: 'llama3-70b-8192',
                 messages: [
                     {
                         role: 'system',
-                        content: 'Tu es un assistant spécialisé en agriculture en Afrique. Réponds en français, de manière claire.'
+                        content: 'Tu es un assistant spécialisé en agriculture en Afrique. Réponds en français, de manière claire et utile.'
                     },
                     { role: 'user', content: message }
                 ],
-                max_tokens: 1024
+                max_tokens: 1024,
+                temperature: 0.7
             })
         });
 
@@ -62,5 +61,5 @@ app.post('/api/chat', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Serveur DeepSeek sur port ${PORT}`);
+    console.log(`Serveur Groq sur port ${PORT}`);
 });
