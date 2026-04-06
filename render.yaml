@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: bufflelearn-api
+    runtime: node
+    repo: https://github.com/amurimboko5-stack/bufflelearn-api
+    buildCommand: npm install
+    startCommand: node server.js
+    plan: free
