@@ -5,18 +5,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Lecture de la clé API DeepSeek (à ajouter dans Render)
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 
 app.get('/', (req, res) => {
-    res.json({ message: 'API BuffleLearn avec DeepSeek (gratuit) !' });
+    res.json({ message: 'API BuffleLearn avec DeepSeek !' });
 });
 
 app.get('/health', (req, res) => {
     res.json({ status: 'OK', deepseek_ready: !!DEEPSEEK_API_KEY });
 });
 
-// Route chat avec DeepSeek (gratuit)
 app.post('/api/chat', async (req, res) => {
     const { message } = req.body;
 
@@ -26,7 +24,7 @@ app.post('/api/chat', async (req, res) => {
 
     if (!DEEPSEEK_API_KEY) {
         return res.json({
-            response: "⚠️ Clé API DeepSeek non configurée. Ajoute DEEPSEEK_API_KEY dans Render."
+            response: "⚠️ Clé API DeepSeek non configurée."
         });
     }
 
@@ -42,39 +40,27 @@ app.post('/api/chat', async (req, res) => {
                 messages: [
                     {
                         role: 'system',
-                        content: 'Tu es un assistant spécialisé en agriculture et investissement agricole en Afrique. Réponds en français, de manière claire et utile.'
+                        content: 'Tu es un assistant spécialisé en agriculture en Afrique. Réponds en français, de manière claire.'
                     },
-                    {
-                        role: 'user',
-                        content: message
-                    }
+                    { role: 'user', content: message }
                 ],
-                max_tokens: 1024,
-                temperature: 0.7
+                max_tokens: 1024
             })
         });
 
         const data = await response.json();
         
         if (data.choices && data.choices[0]) {
-            res.json({
-                response: data.choices[0].message.content,
-                success: true
-            });
+            res.json({ response: data.choices[0].message.content });
         } else {
-            throw new Error(data.error?.message || 'Erreur inconnue');
+            res.json({ response: `Erreur: ${data.error?.message || 'Inconnue'}` });
         }
-
     } catch (error) {
-        console.error('Erreur:', error);
-        res.json({
-            response: `Désolé, une erreur est survenue : ${error.message}`,
-            success: false
-        });
+        res.json({ response: `Erreur: ${error.message}` });
     }
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Serveur BuffleLearn avec DeepSeek sur le port ${PORT}`);
+    console.log(`Serveur DeepSeek sur port ${PORT}`);
 });
